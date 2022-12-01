@@ -53,17 +53,29 @@ def run_check(val):
     elif (("how" in check and "are" in check and "you" in check)):
         talk("I am good!")
     elif (("turn" in check and "off" in check) or ("exit" in check) or ("escape" in check)):
-        talk("Bye")
+        talk("Good Night Sir")
         exit()
-    elif (((("what's" in check) or ("what" in check)) and "is" in check and "time" in check)):
+    elif (((("what's" in check) or ("what" in check)) and "time" in check)):
         talk("It is " + datetime.now().strftime("%H:%M:%S"))
     elif (("open" in check and ("brave" in check) or ("browser") in check)):
         talk("Opening browser")
         webbrowser.get('windows-default').open('https://google.com')
     elif (("weather" in check and ("what" in check or "what's" in check))):
         data = getWeather()
-        talk("The temperature is " + checkNegative(ktoc(data["main"]["temp"])) + str(round(ktoc(
-            data["main"]["temp"]))) + "degree celcius but it feels like " + str(round(data["main"]["feels_like"]-273.15)))
+        tempVal = checkNegative(ktoc(data["main"]["temp"]))
+        temp = str(round(ktoc(data["main"]["temp"])))
+        feel = str(round(data["main"]["feels_like"]-273.15))
+        city = str(data["name"])
+        sky = ""
+        if(data["clouds"]["all"]<50):
+            sky = "very little clouds"
+        else:
+            sky = "very many clouds"
+        talk("The temperature is " + tempVal + temp + "degree celcius but it feels like " + feel + ". It seems today in"+city+", there will be " + sky)
+    elif("what" in check and "temperature" in check):
+        data = getWeather()
+        talk("The temperature is " + checkNegative(ktoc(data["main"]["temp"])) + str(round(ktoc(data["main"]["temp"]))) + "degree celcius but it feels like " + str(round(data["main"]["feels_like"]-273.15)))
+
     elif (("test" in check)):
         talk("Testing")
         os.system('echo Hello')
@@ -88,5 +100,6 @@ def listen():
 def main():
     while True:
         listen()
+
 
 main()
