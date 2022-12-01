@@ -4,11 +4,14 @@ from datetime import datetime
 import webbrowser
 import os
 import pyttsx3
+
 engine = pyttsx3.init()
 engine.setProperty('voice', engine.getProperty('voices')[1].id)
+
 def talk(val):
     engine.say(val)
     engine.runAndWait()
+
 def run_check(val):
     check = val.lower()
     print(">"+check)
@@ -35,11 +38,13 @@ def run_check(val):
 
 m=sr.Microphone()
 r = sr.Recognizer()
-while True:
-    with m as source:
-        audio = r.listen(source)
-    try:
-        value = r.recognize_google(audio)
-        run_check(value)
-    except sr.UnknownValueError:
-        print("Didnt catch that")
+
+def listen():
+    while True:
+        with m as source:
+            audio = r.listen(source)
+        try:
+            value = r.recognize_google(audio)
+            run_check(value)
+        except sr.UnknownValueError:
+            print("Didnt catch that")
