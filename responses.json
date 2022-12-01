@@ -1,0 +1,15 @@
+{
+  "greet-general": ["Hello!", "Hi there", "I hope you are having a good day"],
+  "greet-morning": [
+    "Good morning",
+    "Hello",
+    "I hope waking up was not to difficult"
+  ],
+  "greet-day": [],
+  "greet-night": [],
+  "greet-questions": {
+    "How are you": {
+      "good": ["good", "Im gald to hear that"]
+    }
+  }
+}
