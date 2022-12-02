@@ -7,6 +7,9 @@ import requests
 import json
 import pyttsx3
 from dotenv import dotenv_values
+
+va_name = "ava"
+
 envConfig = dotenv_values()
 weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=38.951883&lon=-92.3337366&appid=" + \
     envConfig["TEST"]
@@ -17,16 +20,22 @@ m = sr.Microphone()
 r = sr.Recognizer()
 is_triggered = False
 
-with m as source:
-    r.adjust_for_ambient_noise(source)
-    audio = r.listen(source)
-
-
-
 def talk(val):
     engine.say(val)
     engine.runAndWait()
 
+def isQuestion(val):
+    if("what" in val or "when" in val or "how" in val or "where" in val or "which" in val or "who" in val):
+        return(True)
+    else:
+        return(False)
+
+def fetchAnswer(val):
+    print(val)
+    url="http://api.wolframalpha.com/v1/spoken?appid=A2RHQP-JXRUR56T9T&i="+val+"%3f&units=metric"
+    res = requests.get(url)
+    if(res.status_code == 200):
+        return(res.text)
 
 def getWeather():
     res = requests.get(weatherURL)
@@ -56,7 +65,7 @@ def ktoc(val):
 def run_check(val):
     check = val.lower()
     print(">"+check)
-    if ((checkValid("hey", check) and "ada" in check) or ("hello" in check and "ada" in check)):
+    if ((checkValid("hey", check) and va_name in check) or ("hello" in check and va_name in check)):
         talk("Hello Yash")
         engine.runAndWait()
     elif (("how" in check and "are" in check and "you" in check)):
@@ -89,6 +98,15 @@ def run_check(val):
     elif (("test" in check)):
         talk("Testing")
         os.system('echo Hello')
+    elif(("led" in check or "LED" in check) and ("toggle" in check)):
+        res = requests.get("http://192.168.1.207/led")
+        if(res.status_code==200):
+            talk("set L E D")
+        else:
+            talk("Problem")
+    elif(isQuestion(check)):
+        output = fetchAnswer(check.replace(" ", "+"))
+        talk(output)
     else:
         talk(val + " Didnt Match")
 
@@ -96,25 +114,19 @@ def run_check(val):
 def trigger():
     global is_triggered
     with m as source:
+        r.adjust_for_ambient_noise(source)
         audio = r.listen(source)
     try:
-        value = r.recognize_google(audio)
-        print(value)
+        value = r.recognize_google(audio).lower()
+        print("Trigger>Try>"+value)
         if(is_triggered == False):
-            if ("hey ava" in value or "ava" in value):
+            if ("hey"+va_name in value or va_name in value):
                 talk("yes?")
                 is_triggered = True
+                print("Trigger>try>set trigge to " + str(is_triggered))
         else:
             run_check(value)
             is_triggered = False
-    except sr.UnknownValueError:
-        print("Didnt catch that")
-
-
-def listen():
-    try:
-        value = r.recognize_google(audio)
-        run_check(value)
     except sr.UnknownValueError:
         print("Didnt catch that")
 
