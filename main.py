@@ -20,22 +20,27 @@ m = sr.Microphone()
 r = sr.Recognizer()
 is_triggered = False
 
+
 def talk(val):
     engine.say(val)
     engine.runAndWait()
 
+
 def isQuestion(val):
-    if("what" in val or "when" in val or "how" in val or "where" in val or "which" in val or "who" in val):
-        return(True)
+    if ("what" in val or "when" in val or "how" in val or "where" in val or "which" in val or "who" in val):
+        return (True)
     else:
-        return(False)
+        return (False)
+
 
 def fetchAnswer(val):
     print(val)
-    url="http://api.wolframalpha.com/v1/spoken?appid=A2RHQP-JXRUR56T9T&i="+val+"%3f&units=metric"
+    url = "http://api.wolframalpha.com/v1/spoken?appid="+envConfig["WOLFRAM"]+"&i=" + \
+        val+"%3f&units=metric"
     res = requests.get(url)
-    if(res.status_code == 200):
-        return(res.text)
+    if (res.status_code == 200):
+        return (res.text)
+
 
 def getWeather():
     res = requests.get(weatherURL)
@@ -64,7 +69,7 @@ def ktoc(val):
 
 def run_check(val):
     check = val.lower()
-    print(">"+check)
+    print("run_check > "+check)
     if ((checkValid("hey", check) and va_name in check) or ("hello" in check and va_name in check)):
         talk("Hello Yash")
         engine.runAndWait()
@@ -98,13 +103,25 @@ def run_check(val):
     elif (("test" in check)):
         talk("Testing")
         os.system('echo Hello')
-    elif(("led" in check or "LED" in check) and ("toggle" in check)):
+    elif (("led" in check or "LED" in check) and ("toggle" in check)):
         res = requests.get("http://192.168.1.207/led")
-        if(res.status_code==200):
-            talk("set L E D")
+        if (res.status_code == 200):
+            talk("Done")
         else:
-            talk("Problem")
-    elif(isQuestion(check)):
+            talk("There was a problem")
+    elif ("led" in check and "on" in check):
+        res = requests.get("http://192.168.1.207/ledon")
+        if(res.status_code == 200):
+            talk("Done")
+        else:
+            talk("There was a problem")            
+    elif ("led" in check and "off" in check):
+        res = requests.get("http://192.168.1.207/ledoff")
+        if(res.status_code == 200):
+            talk("Done")
+        else:
+            talk("There was a problem")            
+    elif (isQuestion(check)):
         output = fetchAnswer(check.replace(" ", "+"))
         talk(output)
     else:
@@ -119,7 +136,7 @@ def trigger():
     try:
         value = r.recognize_google(audio).lower()
         print("Trigger>Try>"+value)
-        if(is_triggered == False):
+        if (is_triggered == False):
             if ("hey"+va_name in value or va_name in value):
                 talk("yes?")
                 is_triggered = True
@@ -134,4 +151,6 @@ def trigger():
 def main():
     while True:
         trigger()
+
+
 main()
