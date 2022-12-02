@@ -13,6 +13,15 @@ weatherURL = "https://api.openweathermap.org/data/2.5/weather?lat=38.951883&lon=
 engine = pyttsx3.init()
 engine.setProperty('voice', engine.getProperty('voices')[1].id)
 
+m = sr.Microphone()
+r = sr.Recognizer()
+is_triggered = False
+
+with m as source:
+    r.adjust_for_ambient_noise(source)
+    audio = r.listen(source)
+
+
 
 def talk(val):
     engine.say(val)
@@ -67,15 +76,16 @@ def run_check(val):
         feel = str(round(data["main"]["feels_like"]-273.15))
         city = str(data["name"])
         sky = ""
-        if(data["clouds"]["all"]<50):
+        if (data["clouds"]["all"] < 50):
             sky = "very little clouds"
         else:
             sky = "very many clouds"
-        talk("The temperature is " + tempVal + temp + "degree celcius but it feels like " + feel + ". It seems today in"+city+", there will be " + sky)
-    elif("what" in check and "temperature" in check):
+        talk("The temperature is " + tempVal + temp + "degree celcius but it feels like " +
+             feel + ". It seems today in"+city+", there will be " + sky)
+    elif ("what" in check and "temperature" in check):
         data = getWeather()
-        talk("The temperature is " + checkNegative(ktoc(data["main"]["temp"])) + str(round(ktoc(data["main"]["temp"]))) + "degree celcius but it feels like " + str(round(data["main"]["feels_like"]-273.15)))
-
+        talk("The temperature is " + checkNegative(ktoc(data["main"]["temp"])) + str(round(ktoc(
+            data["main"]["temp"]))) + "degree celcius but it feels like " + str(round(data["main"]["feels_like"]-273.15)))
     elif (("test" in check)):
         talk("Testing")
         os.system('echo Hello')
@@ -83,13 +93,25 @@ def run_check(val):
         talk(val + " Didnt Match")
 
 
-m = sr.Microphone()
-r = sr.Recognizer()
+def trigger():
+    global is_triggered
+    with m as source:
+        audio = r.listen(source)
+    try:
+        value = r.recognize_google(audio)
+        print(value)
+        if(is_triggered == False):
+            if ("hey ava" in value or "ava" in value):
+                talk("yes?")
+                is_triggered = True
+        else:
+            run_check(value)
+            is_triggered = False
+    except sr.UnknownValueError:
+        print("Didnt catch that")
 
 
 def listen():
-    with m as source:
-        audio = r.listen(source)
     try:
         value = r.recognize_google(audio)
         run_check(value)
@@ -99,7 +121,5 @@ def listen():
 
 def main():
     while True:
-        listen()
-
-
+        trigger()
 main()
