@@ -110,17 +110,23 @@ def run_check(val):
         else:
             talk("There was a problem")
     elif ("led" in check and "on" in check):
-        res = requests.get("http://192.168.1.207/ledon")
-        if (res.status_code == 200):
-            talk("Done")
-        else:
-            talk("There was a problem")
+        try:
+            res = requests.get("http://192.168.1.207/ledon")
+            if (res.status_code == 200):
+                talk("Done")
+            else:
+                talk("There was a problem")
+        except requests.ConnectionError:
+            talk("not connected")
     elif ("led" in check and "off" in check):
-        res = requests.get("http://192.168.1.207/ledoff")
-        if (res.status_code == 200):
-            talk("Done")
-        else:
-            talk("There was a problem")
+        try:
+            res = requests.get("http://192.168.1.207/ledoff")
+            if (res.status_code == 200):
+                talk("Done")
+            else:
+                talk("There was a problem")
+        except requests.ConnectionError:
+            talk("Not connected")
     elif (isQuestion(check)):
         output = fetchAnswer(check.replace(" ", "+"))
         talk(output)
