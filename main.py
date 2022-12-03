@@ -111,21 +111,21 @@ def run_check(val):
             talk("There was a problem")
     elif ("led" in check and "on" in check):
         res = requests.get("http://192.168.1.207/ledon")
-        if(res.status_code == 200):
+        if (res.status_code == 200):
             talk("Done")
         else:
-            talk("There was a problem")            
+            talk("There was a problem")
     elif ("led" in check and "off" in check):
         res = requests.get("http://192.168.1.207/ledoff")
-        if(res.status_code == 200):
+        if (res.status_code == 200):
             talk("Done")
         else:
-            talk("There was a problem")            
+            talk("There was a problem")
     elif (isQuestion(check)):
         output = fetchAnswer(check.replace(" ", "+"))
         talk(output)
     else:
-        talk(val + " Didnt Match")
+        talk(check + " Didnt Match")
 
 
 def trigger():
@@ -147,10 +147,8 @@ def trigger():
     except sr.UnknownValueError:
         print("Didnt catch that")
 
-
 def main():
     while True:
         trigger()
-
 
 main()
